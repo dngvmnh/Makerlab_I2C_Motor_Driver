@@ -220,7 +220,7 @@ def stopM1():
     motor_driver_1.writeMD(0, 0)
 
 # check_motor_drivers()
-time.sleep(5)
+time.sleep(1)
 t_forward(t, per)
 t_backward(t, per)
 t_moveR(t, per)
@@ -233,6 +233,7 @@ t_turnL(t, per)
 t_turnR(t, per)
 t_rearL(t, per)
 t_rearR(t, per)
+
 
 
 
