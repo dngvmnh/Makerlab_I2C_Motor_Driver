@@ -27,8 +27,26 @@ motor_driver_1 = Makerlabvn_I2C_Motor_Driver(i2c, 0x40)
 motor_driver_0.begin()
 motor_driver_1.begin()
 
-per = 100  
+per = 75  
 
+def execute_command(command):
+    function_map = {
+        "forward": forward,
+        "backward": backward,
+        "left": move_left,
+        "right": move_right,
+        "stop": stop,
+        "diagonal-left": diagonal_left,
+        "diagonal-right": diagonal_right,
+        "concern-left": concern_left,
+        "concern-right": concern_right
+    }
+
+    if command in function_map:
+        function_map[command]()
+    else:
+        print("Invalid command:", command)
+        
 def forward():
     stop()
     utime.sleep(0.1)
@@ -47,23 +65,23 @@ def backward():
     motor_driver_1.writeMC(0, per)
     motor_driver_1.writeMD(0, per)
 
-def turn_left():
+def move_left():
     stop()
     utime.sleep(0.1)
-    print("Turning Left")
+    print("Moving Left")
     motor_driver_0.writeMA(0, per)
     motor_driver_0.writeMB(1, per)
-    motor_driver_1.writeMC(0, per)
-    motor_driver_1.writeMD(1, per)
-
-def turn_right():
-    stop()
-    utime.sleep(0.1)
-    print("Turning Right")
-    motor_driver_0.writeMA(1, per)
-    motor_driver_0.writeMB(0, per)
     motor_driver_1.writeMC(1, per)
     motor_driver_1.writeMD(0, per)
+
+def move_right():
+    stop()
+    utime.sleep(0.1)
+    print("Moving Right")
+    motor_driver_0.writeMA(1, per)
+    motor_driver_0.writeMB(0, per)
+    motor_driver_1.writeMC(0, per)
+    motor_driver_1.writeMD(1, per)
 
 def stop():
     print("Stopped")
@@ -71,20 +89,35 @@ def stop():
     motor_driver_0.writeMB(0, 0)
     motor_driver_1.writeMC(0, 0)
     motor_driver_1.writeMD(0, 0)
-
-def execute_command(command):
-    function_map = {
-        "forward": forward,
-        "backward": backward,
-        "left": turn_left,
-        "right": turn_right,
-        "stop": stop
-    }
-
-    if command in function_map:
-        function_map[command]()
-    else:
-        print("Invalid command:", command)
+    
+    
+def diagonal_left():
+    stop()
+    utime.sleep(0.1)
+    print("Diagonaling Left")
+    motor_driver_0.writeMB(1, per)
+    motor_driver_1.writeMC(1, per)
+    
+def diagonal_right():
+    stop()
+    utime.sleep(0.1)
+    print("Diagonaling Right")
+    motor_driver_0.writeMA(1, per)
+    motor_driver_1.writeMD(1, per)
+    
+def concern_left():
+    stop()
+    utime.sleep(0.1)
+    print("Concerning Left")
+    motor_driver_0.writeMA(1, per)
+    motor_driver_1.writeMC(1, per)
+    
+def concern_right():
+    stop()
+    utime.sleep(0.1)
+    print("Concerning Right")
+    motor_driver_0.writeMB(1, per)
+    motor_driver_1.writeMD(1, per)
 
 html = """<!DOCTYPE html>
 <html>
@@ -97,8 +130,22 @@ html = """<!DOCTYPE html>
 </head>
 <body>
     <h2>Mecanum Control</h2>
-    <p><strong>Use arrow keys or buttons to move. Release to stop.</strong></p>
-    
+    <p style="text-align: left; display: inline-block; margin: 0 auto;">
+        <strong>Control the movement of the mecanum vehicle using the arrow keys or on-screen buttons:</strong>
+    </p>  
+    <ul style="text-align: left; display: inline-block; margin: 0 auto;">  
+        <li>Press and hold the <strong>Up Arrow (↑)</strong> or click "Forward" to move forward.</li>  
+        <li>Press and hold the <strong>Down Arrow (↓)</strong> or click "Backward" to move backward.</li>  
+        <li>Press and hold the <strong>Left Arrow (←)</strong> or click "Move Left" to move left.</li>  
+        <li>Press and hold the <strong>Right Arrow (→)</strong> or click "Move Right" to move right.</li>  
+        <li>Press and hold the <strong>Q</strong> key or click "Diagonal Left" to move diagonally left.</li>  
+        <li>Press and hold the <strong>E</strong> key or click "Diagonal Right" to move diagonally right.</li>  
+        <li>Press and hold the <strong>A</strong> key or click "Concern Left" for a special left movement.</li>  
+        <li>Press and hold the <strong>D</strong> key or click "Concern Right" for a special right movement.</li>  
+        <li>Releasing any key will automatically stop the vehicle.</li>  
+        <li>Click the "Stop" button to immediately halt all movement.</li>  
+    </ul>
+        
     <button onclick="sendCommand('diagonal-left')">Diagonal Left</button>
     <button onclick="sendCommand('forward')">Forward</button>
     <button onclick="sendCommand('diagonal-right')">Diagonal Right</button><br>
