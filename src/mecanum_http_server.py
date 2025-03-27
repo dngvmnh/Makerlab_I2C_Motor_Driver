@@ -132,7 +132,7 @@ html = """<!DOCTYPE html>
     <h2>Mecanum Control</h2>
     <p style="text-align: left; display: inline-block; margin: 0 auto;">
         <strong>Control the movement of the mecanum vehicle using the arrow keys or on-screen buttons:</strong>
-    </p>  
+    </p>  <br>
     <ul style="text-align: left; display: inline-block; margin: 0 auto;">  
         <li>Press and hold the <strong>Up Arrow (↑)</strong> or click "Forward" to move forward.</li>  
         <li>Press and hold the <strong>Down Arrow (↓)</strong> or click "Backward" to move backward.</li>  
@@ -144,7 +144,7 @@ html = """<!DOCTYPE html>
         <li>Press and hold the <strong>D</strong> key or click "Concern Right" for a special right movement.</li>  
         <li>Releasing any key will automatically stop the vehicle.</li>  
         <li>Click the "Stop" button to immediately halt all movement.</li>  
-    </ul>
+    </ul><br> 
         
     <button onclick="sendCommand('diagonal-left')">Diagonal Left</button>
     <button onclick="sendCommand('forward')">Forward</button>
