@@ -109,15 +109,15 @@ def concern_left():
     stop()
     utime.sleep(0.1)
     print("Concerning Left")
-    motor_driver_0.writeMA(1, per)
-    motor_driver_1.writeMC(1, per)
+    motor_driver_0.writeMB(0, per)
+    motor_driver_1.writeMC(0, per)
     
 def concern_right():
     stop()
     utime.sleep(0.1)
     print("Concerning Right")
-    motor_driver_0.writeMB(1, per)
-    motor_driver_1.writeMD(1, per)
+    motor_driver_0.writeMA(0, per)
+    motor_driver_1.writeMD(0, per)
 
 html = """<!DOCTYPE html>
 <html>
