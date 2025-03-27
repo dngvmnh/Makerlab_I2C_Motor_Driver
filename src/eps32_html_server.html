@@ -36,10 +36,10 @@
             if (!activeKeys[event.key]) {  
                 activeKeys[event.key] = true;  
                 switch(event.key) {
-                    case "w":
+                    case "ArrowUp":
                         sendCommand("forward");
                         break;
-                    case "s":
+                    case "ArrowDown":
                         sendCommand("backward");
                         break;
                     case "ArrowLeft":
