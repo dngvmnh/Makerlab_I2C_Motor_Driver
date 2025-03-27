@@ -15,5 +15,14 @@ def send_command(direction, time, speed):
 send_command("forward", 3, 80)
 send_command("backward", 2, 50)
 
-# Send commands using cURL
-# curl -X POST http://<ESP32-IP>/ -H "Content-Type: application/json" -d '{"direction": "left", "time": 5, "speed": 60}'
+# Send commands using CMD
+
+# curl -X POST http://192.168.161.168/ ^
+#      -H "Content-Type: application/json" ^
+#      -d "{\"direction\": \"left\", \"time\": 5, \"speed\": 60}"
+
+# Send commands using curl
+
+# curl -X POST http://192.168.161.168/ \
+#      -H "Content-Type: application/json" \
+#      -d '{"direction": "left", "time": 5, "speed": 60}'
