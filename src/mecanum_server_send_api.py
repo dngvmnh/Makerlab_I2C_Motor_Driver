@@ -1,6 +1,6 @@
 import requests
 
-ESP32_IP = "192.168.161.168"  
+ESP32_IP = "192.168.98.230"  
 
 def send_command(direction, time, speed):
     url = f"http://{ESP32_IP}/"
@@ -13,7 +13,7 @@ def send_command(direction, time, speed):
     print(response.json())
 
 send_command("forward", 3, 80)
-send_command("backward", 2, 50)
+send_command("backward", 2, 75)
 
 # Send commands using CMD
 
