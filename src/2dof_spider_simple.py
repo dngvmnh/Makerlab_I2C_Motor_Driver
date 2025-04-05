@@ -17,7 +17,7 @@ S8 = 7
 
 sleep_time = 0.1
 crawl_speed_wait_time = 0.05
-crawl_speed = 0.05
+crawl_speed = 0.1
 
 def base():
     for i in range(8):
@@ -90,203 +90,156 @@ def test_bot():
     test_s7(sleep_time)
     test_s8(sleep_time)
     
-def move_servo_range(servo_index, start, end, step=1):
-    for angle in range(start, end, step):
-        servos[servo_index].duty(angle)
-        sleep(crawl_speed)
-
 def forward_R():
     base()
-
-    move_servo_range(S6, base_angles[S6], 101)
+    servos[S6].duty(100)
     sleep(crawl_speed_wait_time)
-
-    move_servo_range(S4, base_angles[S4], 111)
+    servos[S4].duty(110)
     sleep(crawl_speed_wait_time)
-
-    move_servo_range(S6, 101, base_angles[S6], -1)
+    servos[S6].duty(base_angles[S6])
     sleep(crawl_speed_wait_time)
-
-    move_servo_range(S7, base_angles[S7], 101)
+    
+    servos[S7].duty(100)
     sleep(crawl_speed_wait_time)
-
-    move_servo_range(S1, base_angles[S1], 71, -1)
+    servos[S1].duty(70)
     sleep(crawl_speed_wait_time)
-
-    move_servo_range(S6, 101, base_angles[S6], -1)
+    servos[S7].duty(base_angles[S7])
     sleep(crawl_speed_wait_time)
-
-    move_servo_range(S8, base_angles[S8], 101)
-    move_servo_range(S5, base_angles[S5], 101)
+    
+    servos[S8].duty(100)
+    servos[S5].duty(100)
     sleep(crawl_speed_wait_time)
-
-    move_servo_range(S4, 111, base_angles[S4], -1)
-    move_servo_range(S1, 71, base_angles[S1])
+    servos[S4].duty(base_angles[S4])
+    servos[S1].duty(base_angles[S1])
     sleep(crawl_speed_wait_time)
-
     base()
     
 def forward_L():
     base()
-
-    move_servo_range(S5, base_angles[S5], 101)
+    servos[S5].duty(100)
     sleep(crawl_speed_wait_time)
-
-    move_servo_range(S2, base_angles[S2], 40, -1)
+    servos[S2].duty(40)
     sleep(crawl_speed_wait_time)
-
-    move_servo_range(S5, 101, base_angles[S5], -1)
+    servos[S5].duty(base_angles[S5])
     sleep(crawl_speed_wait_time)
-
-    move_servo_range(S8, base_angles[S8], 101)
+    
+    servos[S8].duty(100)
     sleep(crawl_speed_wait_time)
-
-    move_servo_range(S3, base_angles[S3], 70)
+    servos[S3].duty(70)
     sleep(crawl_speed_wait_time)
-
-    move_servo_range(S8, 101, base_angles[S8], -1)
+    servos[S8].duty(base_angles[S8])
     sleep(crawl_speed_wait_time)
-
-    move_servo_range(S7, base_angles[S7], 101)
-    move_servo_range(S6, base_angles[S6], 101)
+    
+    servos[S7].duty(100)
+    servos[S6].duty(100)
     sleep(crawl_speed_wait_time)
-
-    move_servo_range(S2, 41, base_angles[S2])
-    move_servo_range(S3, 71, base_angles[S3], -1)
+    servos[S2].duty(base_angles[S2])
+    servos[S3].duty(base_angles[S3])
     sleep(crawl_speed_wait_time)
-
     base()
-
+    
 def forward():
     forward_R()
     forward_L()
     
 def backward_R():
     base()
-
-    move_servo_range(S6, base_angles[S6], 101)
+    servos[S6].duty(100)
     sleep(crawl_speed_wait_time)
-
-    move_servo_range(S4, base_angles[S4], 70, -1)
+    servos[S4].duty(70)
     sleep(crawl_speed_wait_time)
-
-    move_servo_range(S6, 101, base_angles[S6], -1)
+    servos[S6].duty(base_angles[S6])
     sleep(crawl_speed_wait_time)
-
-    move_servo_range(S7, base_angles[S7], 101)
+    
+    servos[S7].duty(100)
     sleep(crawl_speed_wait_time)
-
-    move_servo_range(S1, base_angles[S1], 111)
+    servos[S1].duty(110)
     sleep(crawl_speed_wait_time)
-
-    move_servo_range(S7, 101, base_angles[S7], -1)
+    servos[S7].duty(base_angles[S7])
     sleep(crawl_speed_wait_time)
-
-    move_servo_range(S8, base_angles[S8], 101)
-    move_servo_range(S5, base_angles[S5], 101)
+    
+    servos[S8].duty(100)
+    servos[S5].duty(100)
     sleep(crawl_speed_wait_time)
-
-    move_servo_range(S4, 71, base_angles[S4])
-    move_servo_range(S1, 111, base_angles[S1], -1)
+    servos[S4].duty(base_angles[S4])
+    servos[S1].duty(base_angles[S1])
     sleep(crawl_speed_wait_time)
-
     base()
-  
+    
 def backward_L():
     base()
-
-    move_servo_range(S5, base_angles[S5], 101)
+    servos[S5].duty(100)
     sleep(crawl_speed_wait_time)
-
-    move_servo_range(S2, base_angles[S2], 81)
+    servos[S2].duty(80)
     sleep(crawl_speed_wait_time)
-
-    move_servo_range(S5, 101, base_angles[S5], -1)
+    servos[S5].duty(base_angles[S5])
     sleep(crawl_speed_wait_time)
-
-    move_servo_range(S8, base_angles[S8], 101)
+    
+    servos[S8].duty(100)
     sleep(crawl_speed_wait_time)
-
-    move_servo_range(S3, base_angles[S3], 30, -1)
+    servos[S3].duty(30)
     sleep(crawl_speed_wait_time)
-
-    move_servo_range(S8, 101, base_angles[S8], -1)
+    servos[S8].duty(base_angles[S8])
     sleep(crawl_speed_wait_time)
-
-    move_servo_range(S7, base_angles[S7], 101)
-    move_servo_range(S6, base_angles[S6], 101)
+    
+    servos[S7].duty(100)
+    servos[S6].duty(100)
     sleep(crawl_speed_wait_time)
-
-    move_servo_range(S2, 81, base_angles[S2], -1)
-    move_servo_range(S3, 31, base_angles[S3])
+    servos[S2].duty(base_angles[S2])
+    servos[S3].duty(base_angles[S3])
     sleep(crawl_speed_wait_time)
-
     base()
-
+    
 def backward():
     backward_R()
     backward_L()
     
 def turn_left():
     base()
-
-    move_servo_range(S6, base_angles[S6], 101)
+    servos[S6].duty(100)
     sleep(crawl_speed_wait_time)
-
-    move_servo_range(S4, base_angles[S4], 111)
+    servos[S4].duty(110)
     sleep(crawl_speed_wait_time)
-
-    move_servo_range(S6, 101, base_angles[S6], -1)
+    servos[S6].duty(base_angles[S6])
     sleep(crawl_speed_wait_time)
-
-    move_servo_range(S7, base_angles[S7], 101)
+    
+    servos[S7].duty(100)
     sleep(crawl_speed_wait_time)
-
-    move_servo_range(S1, base_angles[S1], 111)
+    servos[S1].duty(110)
     sleep(crawl_speed_wait_time)
-
-    move_servo_range(S7, 101, base_angles[S7], -1)
+    servos[S7].duty(base_angles[S7])
     sleep(crawl_speed_wait_time)
-
-    move_servo_range(S8, base_angles[S8], 101)
-    move_servo_range(S5, base_angles[S5], 101)
+    
+    servos[S8].duty(100)
+    servos[S5].duty(100)
     sleep(crawl_speed_wait_time)
-
-    move_servo_range(S4, 111, base_angles[S4], -1)
-    move_servo_range(S1, 111, base_angles[S1], -1)
+    servos[S4].duty(base_angles[S4])
+    servos[S1].duty(base_angles[S1])
     sleep(crawl_speed_wait_time)
-
     base()
-
+    
 def turn_right():
     base()
-
-    move_servo_range(S5, base_angles[S5], 101)
+    servos[S5].duty(100)
     sleep(crawl_speed_wait_time)
-
-    move_servo_range(S2, base_angles[S2], 40, -1)
+    servos[S2].duty(40)
     sleep(crawl_speed_wait_time)
-
-    move_servo_range(S5, 101, base_angles[S5], -1)
+    servos[S5].duty(base_angles[S5])
     sleep(crawl_speed_wait_time)
-
-    move_servo_range(S8, base_angles[S8], 101)
+    
+    servos[S8].duty(100)
     sleep(crawl_speed_wait_time)
-
-    move_servo_range(S3, base_angles[S3], 30, -1)
+    servos[S3].duty(30)
     sleep(crawl_speed_wait_time)
-
-    move_servo_range(S8, 101, base_angles[S8], -1)
+    servos[S8].duty(base_angles[S8])
     sleep(crawl_speed_wait_time)
-
-    move_servo_range(S7, base_angles[S7], 101)
-    move_servo_range(S6, base_angles[S6], 101)
+    
+    servos[S7].duty(100)
+    servos[S6].duty(100)
     sleep(crawl_speed_wait_time)
-
-    move_servo_range(S2, 41, base_angles[S2])
-    move_servo_range(S3, 31, base_angles[S3])
+    servos[S2].duty(base_angles[S2])
+    servos[S3].duty(base_angles[S3])
     sleep(crawl_speed_wait_time)
-
     base()
 
 test_bot()
