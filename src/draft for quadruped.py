@@ -1,302 +1,86 @@
-from machine import Pin, PWM
 from time import sleep
+import math
 
 servo_pins = [19, 23, 5, 13, 2, 14, 27, 26]
 base_angles = [90, 60, 50, 90, 80, 80, 80, 80]
-
-servos = [PWM(Pin(pin), freq=50) for pin in servo_pins]
-
-S1 = 0
-S2 = 1
-S3 = 2
-S4 = 3
-S5 = 4
-S6 = 5
-S7 = 6
-S8 = 7
-
+S1, S2, S3, S4, S5, S6, S7, S8 = 0, 1, 2, 3, 4, 5, 6, 7
 sleep_time = 0.1
-crawl_speed_wait_time = 0.05
-crawl_speed = 0.05
+crawl_speed_wait_time = 0.005
+crawl_speed = 0.005
+L1 = 4  # femur
+L2 = 5  # tibia 
+corner_1 = (-2.5, -4, 0)
+corner_2 = (-2.5, 4, 0)
+corner_3 = (2.5, -4, 0)
+corner_4 = (2.5, 4, 0)
 
+from machine import Pin, PWM
+servos = [PWM(Pin(pin), freq=50) for pin in servo_pins]
+crawl_speed = 0.005
 def base():
     for i in range(8):
         servos[i].duty(base_angles[i]) 
-
-def test_s1(sleep_time):
-    s = PWM(Pin(19), freq=50)
-    s.duty(70)
-    sleep(sleep_time)
-    s.duty(110)
-    sleep(sleep_time)
-
-def test_s2(sleep_time):
-    s = PWM(Pin(23), freq=50)
-    s.duty(80)
-    sleep(sleep_time)
-    s.duty(40)
-    sleep(sleep_time)
-
-def test_s3(sleep_time):
-    s = PWM(Pin(5), freq=50)
-    s.duty(70)
-    sleep(sleep_time)
-    s.duty(30)
-    sleep(sleep_time)
-
-def test_s4(sleep_time):
-    s = PWM(Pin(13), freq=50)
-    s.duty(70)
-    sleep(sleep_time)
-    s.duty(110)
-    sleep(sleep_time)
-
-def test_s5(sleep_time):
-    s = PWM(Pin(2), freq=50)
-    s.duty(60)
-    sleep(sleep_time)
-    s.duty(100)
-    sleep(sleep_time)
-
-def test_s6(sleep_time):
-    s = PWM(Pin(14), freq=50)
-    s.duty(60)
-    sleep(sleep_time)
-    s.duty(100)
-    sleep(sleep_time)
-
-def test_s7(sleep_time):
-    s = PWM(Pin(27), freq=50)
-    s.duty(60)
-    sleep(sleep_time)
-    s.duty(100)
-    sleep(sleep_time)
-
-def test_s8(sleep_time):
-    s = PWM(Pin(26), freq=50)
-    s.duty(60)
-    sleep(sleep_time)
-    s.duty(100)
-    sleep(sleep_time)
-
-def test_bot(): 
-    base()
-    test_s1(sleep_time)
-    test_s2(sleep_time)
-    test_s3(sleep_time)
-    test_s4(sleep_time)
-    test_s5(sleep_time)
-    test_s6(sleep_time)
-    test_s7(sleep_time)
-    test_s8(sleep_time)
-    
 def move_servo_range(servo_index, start, end, step=1):
     for angle in range(start, end, step):
         servos[servo_index].duty(angle)
         sleep(crawl_speed)
 
-def forward_R():
-    base()
+def ik_theta(x, y, z, corner):    
+    dx, dy, dz = x - corner[0], y - corner[1], z - corner[2]
+    L3 = math.sqrt(dx**2 + dy**2 + dz**2)
+    if abs(L3) > (L1 + L2) or abs(L3) < abs(L1 - L2):
+        print("Error: leg out of reach")
+        return None
+    L4 = math.sqrt(L2**2 -z **2)
+    cos_theta2 = (L1**2 + L2**2 - L3**2)/(2 * L1 * L2)
+    theta2 = math.acos(cos_theta2)
+    theta2 = math.degrees(theta2)
+    theta1 = math.acos(y/(L1 + L4))
+    theta1 = math.degrees(theta1)
+    while theta1 > 90:
+        theta1 = 180 - theta1
+    while theta1 < 0:
+        theta1 = 180 + theta1
+    while theta2 > 90:
+        theta2 = 180 - theta2
+    while theta2 < 0:
+        theta2 = 180 + theta2
+    # if 15 < theta1 < 75 or 60 < theta2 < 100:
+    #     print("Error: angles out of range")
+    #     return None
+    theta1 = max(15, min(theta1, 75))
+    theta2 = max(60, min(theta2, 100))
+    return theta1, theta2
 
-    move_servo_range(S6, base_angles[S6], 101)
-    sleep(crawl_speed_wait_time)
+def tripod_step(step_size=1.0, lift_height=2.0, z_ground=0.0):
+    default_positions = {
+        's1': (-2.5, -4, z_ground),
+        's2': (-2.5, 4, z_ground),
+        's3': (2.5, -4, z_ground),
+        's4': (2.5, 4, z_ground)
+    }
+    corners = {'s1': corner_1, 's2': corner_2, 's3': corner_3, 's4': corner_4}
+    forward_offset = (0, step_size, 0)
+    lift_offset = (0, 0, lift_height)
+    tripod_legs = [['s4'], ['s1'], ['s3'],['s2']]
+    for leg_group in tripod_legs:
+        for leg in leg_group:
+            x, y, z = default_positions[leg]
 
-    move_servo_range(S4, base_angles[S4], 111)
-    sleep(crawl_speed_wait_time)
+            # Lift leg
+            lifted = (x + forward_offset[0], y + forward_offset[1], z + lift_offset[2])
+            angles = ik_theta(*lifted, corners[leg])
+            if angles:
+                print(f"Move leg {leg} to {lifted} -> angles: {angles}")
+                # servos[...] = duty based on angles
 
-    move_servo_range(S6, 101, base_angles[S6], -1)
-    sleep(crawl_speed_wait_time)
+            # Lower leg forward
+            forward = (x + forward_offset[0], y + forward_offset[1], z)
+            angles = ik_theta(*forward, corners[leg])
+            if angles:
+                print(f"Place leg {leg} to {forward} -> angles: {angles}")
+                # servos[...] = duty based on angles
 
-    move_servo_range(S7, base_angles[S7], 101)
-    sleep(crawl_speed_wait_time)
+        sleep(sleep_time)
 
-    move_servo_range(S1, base_angles[S1], 71, -1)
-    sleep(crawl_speed_wait_time)
-
-    move_servo_range(S6, 101, base_angles[S6], -1)
-    sleep(crawl_speed_wait_time)
-
-    move_servo_range(S8, base_angles[S8], 101)
-    move_servo_range(S5, base_angles[S5], 101)
-    sleep(crawl_speed_wait_time)
-
-    move_servo_range(S4, 111, base_angles[S4], -1)
-    move_servo_range(S1, 71, base_angles[S1])
-    sleep(crawl_speed_wait_time)
-
-    base()
-    
-def forward_L():
-    base()
-
-    move_servo_range(S5, base_angles[S5], 101)
-    sleep(crawl_speed_wait_time)
-
-    move_servo_range(S2, base_angles[S2], 40, -1)
-    sleep(crawl_speed_wait_time)
-
-    move_servo_range(S5, 101, base_angles[S5], -1)
-    sleep(crawl_speed_wait_time)
-
-    move_servo_range(S8, base_angles[S8], 101)
-    sleep(crawl_speed_wait_time)
-
-    move_servo_range(S3, base_angles[S3], 70)
-    sleep(crawl_speed_wait_time)
-
-    move_servo_range(S8, 101, base_angles[S8], -1)
-    sleep(crawl_speed_wait_time)
-
-    move_servo_range(S7, base_angles[S7], 101)
-    move_servo_range(S6, base_angles[S6], 101)
-    sleep(crawl_speed_wait_time)
-
-    move_servo_range(S2, 41, base_angles[S2])
-    move_servo_range(S3, 71, base_angles[S3], -1)
-    sleep(crawl_speed_wait_time)
-
-    base()
-
-def forward():
-    forward_R()
-    forward_L()
-    
-def backward_R():
-    base()
-
-    move_servo_range(S6, base_angles[S6], 101)
-    sleep(crawl_speed_wait_time)
-
-    move_servo_range(S4, base_angles[S4], 70, -1)
-    sleep(crawl_speed_wait_time)
-
-    move_servo_range(S6, 101, base_angles[S6], -1)
-    sleep(crawl_speed_wait_time)
-
-    move_servo_range(S7, base_angles[S7], 101)
-    sleep(crawl_speed_wait_time)
-
-    move_servo_range(S1, base_angles[S1], 111)
-    sleep(crawl_speed_wait_time)
-
-    move_servo_range(S7, 101, base_angles[S7], -1)
-    sleep(crawl_speed_wait_time)
-
-    move_servo_range(S8, base_angles[S8], 101)
-    move_servo_range(S5, base_angles[S5], 101)
-    sleep(crawl_speed_wait_time)
-
-    move_servo_range(S4, 71, base_angles[S4])
-    move_servo_range(S1, 111, base_angles[S1], -1)
-    sleep(crawl_speed_wait_time)
-
-    base()
-  
-def backward_L():
-    base()
-
-    move_servo_range(S5, base_angles[S5], 101)
-    sleep(crawl_speed_wait_time)
-
-    move_servo_range(S2, base_angles[S2], 81)
-    sleep(crawl_speed_wait_time)
-
-    move_servo_range(S5, 101, base_angles[S5], -1)
-    sleep(crawl_speed_wait_time)
-
-    move_servo_range(S8, base_angles[S8], 101)
-    sleep(crawl_speed_wait_time)
-
-    move_servo_range(S3, base_angles[S3], 30, -1)
-    sleep(crawl_speed_wait_time)
-
-    move_servo_range(S8, 101, base_angles[S8], -1)
-    sleep(crawl_speed_wait_time)
-
-    move_servo_range(S7, base_angles[S7], 101)
-    move_servo_range(S6, base_angles[S6], 101)
-    sleep(crawl_speed_wait_time)
-
-    move_servo_range(S2, 81, base_angles[S2], -1)
-    move_servo_range(S3, 31, base_angles[S3])
-    sleep(crawl_speed_wait_time)
-
-    base()
-
-def backward():
-    backward_R()
-    backward_L()
-    
-def turn_left():
-    base()
-
-    move_servo_range(S6, base_angles[S6], 101)
-    sleep(crawl_speed_wait_time)
-
-    move_servo_range(S4, base_angles[S4], 111)
-    sleep(crawl_speed_wait_time)
-
-    move_servo_range(S6, 101, base_angles[S6], -1)
-    sleep(crawl_speed_wait_time)
-
-    move_servo_range(S7, base_angles[S7], 101)
-    sleep(crawl_speed_wait_time)
-
-    move_servo_range(S1, base_angles[S1], 111)
-    sleep(crawl_speed_wait_time)
-
-    move_servo_range(S7, 101, base_angles[S7], -1)
-    sleep(crawl_speed_wait_time)
-
-    move_servo_range(S8, base_angles[S8], 101)
-    move_servo_range(S5, base_angles[S5], 101)
-    sleep(crawl_speed_wait_time)
-
-    move_servo_range(S4, 111, base_angles[S4], -1)
-    move_servo_range(S1, 111, base_angles[S1], -1)
-    sleep(crawl_speed_wait_time)
-
-    base()
-
-def turn_right():
-    base()
-
-    move_servo_range(S5, base_angles[S5], 101)
-    sleep(crawl_speed_wait_time)
-
-    move_servo_range(S2, base_angles[S2], 40, -1)
-    sleep(crawl_speed_wait_time)
-
-    move_servo_range(S5, 101, base_angles[S5], -1)
-    sleep(crawl_speed_wait_time)
-
-    move_servo_range(S8, base_angles[S8], 101)
-    sleep(crawl_speed_wait_time)
-
-    move_servo_range(S3, base_angles[S3], 30, -1)
-    sleep(crawl_speed_wait_time)
-
-    move_servo_range(S8, 101, base_angles[S8], -1)
-    sleep(crawl_speed_wait_time)
-
-    move_servo_range(S7, base_angles[S7], 101)
-    move_servo_range(S6, base_angles[S6], 101)
-    sleep(crawl_speed_wait_time)
-
-    move_servo_range(S2, 41, base_angles[S2])
-    move_servo_range(S3, 31, base_angles[S3])
-    sleep(crawl_speed_wait_time)
-
-    base()
-
-test_bot()
-for i in range(10):
-    # forward()
-    # backward()
-    # turn_left()
-    # turn_right()
-    sleep(crawl_speed_wait_time)
-base()    
-
-
-
+tripod_step()
