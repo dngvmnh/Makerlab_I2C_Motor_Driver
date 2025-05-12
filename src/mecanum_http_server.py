@@ -3,6 +3,7 @@ import socket
 import utime
 from machine import I2C, Pin
 from Makerlab_I2C_Motor_Driver import Makerlabvn_I2C_Motor_Driver
+import gc
 
 WIFI_SSID = "Dngvmnh"
 WIFI_PASS = "Persistent2025"
@@ -216,16 +217,28 @@ server_socket.listen(5)
 print("HTTP Server running...")
 
 while True:
-    conn, addr = server_socket.accept()
-    request = conn.recv(1024)
-    request_str = request.decode('utf-8')
-    print(f"Request from {addr}: {request_str}")
+    try:
+        conn, addr = server_socket.accept()
+        request = conn.recv(1024)
+        request_str = request.decode('utf-8')
+        print(f"Request from {addr}: {request_str}")
 
-    command = request_str.split("GET /")[1].split(" ")[0]
-    execute_command(command)  
+        command = request_str.split("GET /")[1].split(" ")[0]
+        execute_command(command)
 
-    conn.send("HTTP/1.1 200 OK\nContent-Type: text/html\nConnection: close\n\n")
-    conn.sendall(html)
-    conn.close()
+        if command == "":
+            conn.send("HTTP/1.1 200 OK\nContent-Type: text/html\nConnection: close\n\n")
+            conn.sendall(html)
+        else:
+            conn.send("HTTP/1.1 200 OK\nContent-Type: text/plain\nConnection: close\n\n")
+            conn.sendall(b"Command received")
+
+    except Exception as e:
+        print("Error:", e)
+    finally:
+        conn.close()
+        gc.collect()
+
+
 
 
