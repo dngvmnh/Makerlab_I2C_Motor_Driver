@@ -8,6 +8,7 @@ This guide sets up a remote control system for an ESP32 Mecanum vehicle using a 
 To allow external devices (ESP32) to access your Flask server, run this command in **Command Prompt (as Administrator)**:
 
 netsh advfirewall firewall add rule name="Flask Port 5000" dir=in action=allow protocol=TCP localport=5000
+
 💻 3. Flask Web Server (Computer Side)
 This Python app provides a browser interface and keyboard input control to send movement commands to the ESP32.
 
