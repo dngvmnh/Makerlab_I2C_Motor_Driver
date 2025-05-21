@@ -1,6 +1,6 @@
 import requests
 
-ESP32_IP = ""  
+ESP32_IP = "192.168.198.214"  
 
 def send_command(direction, time, speed):
     url = f"http://{ESP32_IP}/"

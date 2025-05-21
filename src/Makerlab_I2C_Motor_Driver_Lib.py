@@ -14,10 +14,12 @@ class Makerlabvn_I2C_Motor_Driver:
             self.addressDriver = self.MAKERLABVN_I2C_DRIVER_SLAVE_ADDRESS_MIN
 
     def begin(self):
-        self.MB(0, 0)
         self.MA(0, 0)
-        self.freeS2()
+        self.MB(0, 0)
+        self.MC(0, 0)
+        self.MD(0, 0)
         self.freeS1()
+        self.freeS2()
 
     def checkSumCalculate(self, motor_data):
         tempSum = sum(motor_data)
@@ -39,14 +41,14 @@ class Makerlabvn_I2C_Motor_Driver:
         return "I2C_MOTOR_DRIVER_CODE_INVALID_ADDRESS"
 
     def motorDC_Write(self, index, direction, speed):
-        if index < 2:  # Assuming two DC motors
+        if index < 4:  # Now supporting 4 DC motors
             data = [self.addressDriver, 0x01, index, speed, direction]  # 0x01 is the mode ID
             data.append(self.checkSumCalculate(data))  # Add checksum
             self.i2c.writeto(self.addressDriver, bytes(data))
             time.sleep(self.DELAY_I2C_SEND)
 
     def motorRC_Write(self, index, pulse):
-        if index < 2:  # Assuming two RC motors
+        if index < 4:  # Now supporting 4 RC motors
             data = [self.addressDriver, 0x02, index, pulse & 0xFF, (pulse >> 8) & 0xFF]
             data.append(self.checkSumCalculate(data))  # Add checksum
             self.i2c.writeto(self.addressDriver, bytes(data))
@@ -57,6 +59,12 @@ class Makerlabvn_I2C_Motor_Driver:
 
     def MB(self, direction, speed):
         self.motorDC_Write(1, direction, speed)
+    
+    def MC(self, direction, speed):
+        self.motorDC_Write(0, direction, speed)
+
+    def MD(self, direction, speed):
+        self.motorDC_Write(1, direction, speed)
 
     def writeMA(self, direction, percentSpeed):
         pwm = int((percentSpeed / 100) * 255)
@@ -65,15 +73,19 @@ class Makerlabvn_I2C_Motor_Driver:
     def writeMB(self, direction, percentSpeed):
         pwm = int((percentSpeed / 100) * 255)
         self.MB(direction, pwm)
+    
+    def writeMC(self, direction, percentSpeed):
+        pwm = int((percentSpeed / 100) * 255)
+        self.MC(direction, pwm)
+    
+    def writeMD(self, direction, percentSpeed):
+        pwm = int((percentSpeed / 100) * 255)
+        self.MD(direction, pwm)
 
     def freeS1(self):
         self.motorRC_Write(0, 0)
 
     def freeS2(self):
         self.motorRC_Write(1, 0)
-
-
-
-
 
 

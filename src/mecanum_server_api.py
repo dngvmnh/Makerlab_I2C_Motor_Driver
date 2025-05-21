@@ -3,7 +3,7 @@ import socket
 import utime
 import json
 from machine import I2C, Pin
-from Makerlab_I2C_Motor_Driver import Makerlabvn_I2C_Motor_Driver
+from Makerlab_I2C_Motor_Driver_Lib import Makerlabvn_I2C_Motor_Driver
 
 WIFI_SSID = "Dngvmnh"
 WIFI_PASS = "Persistent2025"
@@ -22,7 +22,7 @@ def connect_wifi():
 
 connect_wifi()
 
-i2c = I2C(1, scl=Pin(22), sda=Pin(21))
+i2c = I2C(1, scl=Pin(8), sda=Pin(9))
 motor_driver_0 = Makerlabvn_I2C_Motor_Driver(i2c, 0x41)
 motor_driver_1 = Makerlabvn_I2C_Motor_Driver(i2c, 0x40)
 motor_driver_0.begin()
